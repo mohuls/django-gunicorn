@@ -97,7 +97,7 @@ Now develop the django application locally. Make sure the version of virtual env
 
 # Select Web Server
 1. [Nginx](https://github.com/mohuls/django-gunicorn#option-1-nginx-web-server)
-2. [Apache] (https://github.com/mohuls/django-gunicorn#option-2-apache-web-server)
+2. [Apache](https://github.com/mohuls/django-gunicorn#option-2-apache-web-server)
 
 
 # Option-1 (Nginx web server)
@@ -189,3 +189,4 @@ server {
 
 
 # Option-2 (Apache Web Server)
+See you later
