@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+<html>
+    <body>
+        {% block content %}
+        <br />
+        <h1>Welcome to Stock Market</h1><br/>
+        {% if ticker %}
+        <h2>Made with ❤ Django by Humaun Kabir</h2>
+        {% endif %}
+        {% if api %}
+            {% if api == "Error..." %}
+                There is an error recieving the stocks data
+            {% else %}
+                <h1>{{ api.companyName }}</h1><br/>
+                Price: ${{ api.latestPrice }}</br>
+                Previous Close: {{ api.previousClose }}</br>
+                Market Cap: ${{ api.marketCap }}</br>
+                YTD Changes: {{ api.ytdChange }}</br>
+                week52High: {{ api.week52High }}</br>
+                week52Low: {{ api.week52Low }}</br>
+            {% endif %}
+        {% endif %}
+        {% endblock %}
+    </body>
+</html>

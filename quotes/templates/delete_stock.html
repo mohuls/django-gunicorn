@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+<html>
+    <body>
+        {% block content %}
+        <h1>Delete Stock</h1>
+
+        <h3>All the added stock list</h3>
+
+        {% if ticker %}
+        {% for item in ticker %}
+            <a class="btn btn-danger" href="{% url 'delete' item.id %}">Delete {{ item }}</a><br/><br/>
+        {% endfor %}
+        {% else %}
+            Dont have any stack <a href="{% url 'add_stock' %}">Add Stock</a>
+        {% endif %}
+        {% endblock %}
+    </body>
+</html>

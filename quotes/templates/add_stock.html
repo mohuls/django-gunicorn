@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+<html>
+    <body>
+        <br/>
+        {% block content %}
+        <h1>Add Stocks</h1>
+        <br>
+        <form sction="{% url 'add_stock' %}" class="form-inline my-2 my-lg-0" method="POST">
+        {% csrf_token %}
+        <input Required class="form-control mr-sm-2" type="search" name="ticker" placeholder="Company name" aria-label="Search">
+        <button class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Add Stocks</button>
+        </form>
+        <br/>
+        <table class="table table-striped table-bordered table-hover">
+        <thead>
+            <tr>
+            <th scope="col">Company Name</th>
+            <th scope="col">Price</th>
+            <th scope="col">Previous Close</th>
+            <th scope="col">Market Cap</th>
+            <th scope="col">YTD Changes</th>
+            <th scope="col">week52High</th>
+            <th scope="col">week52Low</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% if ticker %}
+            {% for list_item in output %}
+                <tr>
+                    <th scope="row">{{ list_item.companyName }}</th>
+                    <td>${{ list_item.latestPrice }}</td>
+                    <td>${{ list_item.previousClose }}</td>
+                    <td>${{ list_item.marketCap }}</td>
+                    <td>{{ list_item.ytdChange }}%</td>
+                    <td>${{ list_item.week52High }}</td>
+                    <td>${{ list_item.week52Low }}</td>
+                </tr>
+            {% endfor %}
+        {% else %}
+            <tr><td>No stock added yet</td></tr>
+        {% endif %}
+        </tbody>
+        </table>
+        <br/>
+        <br/>
+        <h3>Delete Stocks</h3>
+        {% for item in ticker %}
+            <a class="btn btn-danger" href="{% url 'delete' item.id %}">Delete {{ item }}</a>&nbsp&nbsp
+            &nbsp &nbsp&nbsp
+        {% endfor %}
+     {% endblock %}
+    </body>
+</html>
