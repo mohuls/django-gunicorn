@@ -96,8 +96,7 @@ Now develop the django application locally. Make sure the version of virtual env
 10. Now Browse the server IP with port 8000 (http://server-ip:8000)to see if the app is running. (It should be running actually).
 
 # Select Web Server
-1. [Nginx]: https://github.com/mohuls/django-gunicorn#option-1-nginx-web-server
-2. [Apache]: https://github.com/mohuls/django-gunicorn#option-2-apache-web-server
+1. [Nginx (https://github.com/mohuls/django-gunicorn#option-1-nginx-web-server)][Nginx] 
 
 # Option-1 (Nginx web server)
 ## Run using gunicorn server (Remote)
