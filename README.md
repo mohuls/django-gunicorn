@@ -80,3 +80,103 @@ Now develop the django application locally. Make sure the version of virtual env
 3. `$ git init` then `$ git add .` the `$ git commit -m 'test deploy'`
 4. `$ git remote add origin git@github.com:mohuls/django-gunicorn.git` the GitHub repo we just created on GitHub.
 5. `$ git push -u origin master` to push the full project to GitHub repo.
+
+## Deploying to Live Server (Remote)
+
+1. Clone the github repo `$ git clone https://github.com/mohuls/django-gunicorn` in a directory at server.
+2. Copy all the cloned files to project dir where you created the virtual environment `$ cp -a django-gunicorn/. ~/django-gunicorn`.
+2. cd to the project dir.
+3. `$ source env/bin/activate` to activate the virtual env (important).
+4. `$ pip install -r requirements.txt` to install all the required package.
+5. `$ nano stocks/settings.py` and add the server IP or domain in the allowed hosts list. The line will looks like `ALLOWED_HOSTS = ['192.46.213.168', 'example.com']`. Now go to bottom of the file and add `STATIC_ROOT = os.path.join(BASE_DIR, 'static/')` for static file location. import the os modue at the top if it is not imported already.
+6. `$ python manage.py makemigrations` and `$ python manage.py migrate` to migrate the database.
+7. `$ python manage.py collectstatic` to compile static file in the static dir.
+8. `$ sudo ufw allow 8000` to allow the development port.
+9. `$ python manage.py runserver 0.0.0.0:8000` to run the development server.
+10. Now Browse the server IP with port 8000 (http://server-ip:8000)to see if the app is running. (It should be running actually).
+
+## Run using gunicorn server (Remote)
+
+1. cd to project dir then make sure the virtual environment is active (`$ source env/bin/activate`)
+2. `$ pip install gunicorn` to install gunicorn application server.
+3. `$ gunicorn --bind 0.0.0.0:8000 stocks.wsgi` to start the application using gunicorn server.
+
+
+## Configuring Gunicorn Startup service
+
+1. Cd to project dir.
+2. `$ deactivate` to deactivate the virtual environment.
+3. `$ sudo nano /etc/systemd/system/django-gunicorn.service` here **django-gunicorn** is the gunicorn service name. Change according to your choice. Conventionally use the name of the app. Paste the following:
+
+```conf
+[Unit]
+Description=gunicorn service for serving a django app
+After=network.target
+
+[Service]
+User=mohul
+Group=www-data
+WorkingDirectory=/home/mohul/django-gunicorn
+ExecStart=/home/mohul/django-gunicorn/env/bin/gunicorn --access-logfile - --workers 3 --bind unix:/home/mohul/django-gunicorn/django-gunicorn.sock stocks.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
+```
+
+**Note:** Here define the current username, path of virtual env bin and gunicorn service path and here `django-gunicorn` is the app name. `stocks` is the project name.
+
+5. `$ sudo systemctl start django-gunicorn` to start the gunicorn server.
+6. `$ sudo systemctl enable django-gunicorn` to enable the gunicorn server on system startup.
+7. `$ sudo systemctl status django-gunicorn` to check the status.
+8. `$ sudo systemctl stop django-gunicorn` to stop the service.
+
+## Configuring Nginx
+1. `$ sudo apt install nginx` to install nginx server.
+2. `$ sudo nano /etc/nginx/sites-available/django-gunicorn` create a nginx server configaration.
+```conf
+server {
+    listen 80;
+    server_name server_domain_or_IP;
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location /static/ {
+        root /home/mohul/django-gunicorn;
+    }
+
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/home/mohul/django-gunicorn/django-gunicorn.sock;
+    }
+}
+``` 
+3. `$ sudo ln -s /etc/nginx/sites-available/django-gunicorn /etc/nginx/sites-enabled` to enable the conf file.
+4. `$ sudo unlink /etc/nginx/sites-enabled/default` to disable the default site.
+
+5. `$ sudo nginx -t` to check the configaration file.
+6. `$ sudo systemctl restart nginx` to restart the server.
+7. `$ sudo ufw delete allow 8000` to delete the development port.
+8. `$ sudo ufw allow 'Nginx Full'` to allow nginx traffic.
+9. Now browse the server IP again. Now it should serve the application using Nginx web server by piping to gunicorn server.
+
+## Configuring Domain
+
+0. Edit the `$ nano stocks/settings.py` file and add the domain name in the `ALLOWED_HOSTS` list.
+1. `$ sudo nano /etc/nginx/sites-available/django-gunicorn` edit the server block file. Replace the domain name you want to configure with the server IP.
+2. Make sure you have added the IP address in the domain's DNS.
+3. `$ sudo systemctl restart nginx` to restart the server.
+4. Wait for propagrating the domain wordwide (can take upto 48 hours)
+5. Now the app sould be accessed by the domain name.
+
+## Configuring Let's Encrypt SSL
+1. `$ sudo apt install python3-certbot-nginx` to install certbot.
+2. `$ sudo ufw allow 'Nginx Full'` allow Nginx in http and htpps.
+3. `$ sudo nano /etc/nginx/sites-available/django-gunicorn` and add the host name as the domain name that is configured with the server ip: server_name mohuls.com www.mohuls.com;
+4. `$ sudo systemctl restart nginx` restarts nginx.
+5. `$ sudo certbot --nginx -d mohuls.com -d www.mohuls.com` starts the installation process. Answer appropriate to the asked questions to complete.
+6. `$ sudo systemctl status certbot.timer` to check status.
+7. `$ sudo certbot renew --dry-run` tests renewal process. Now the site should serve in https.
+
+## Disable Debug Mode
+
+1. When you are on production the disable the Debug mode in the settings.py.
+2. `$ nano stocks/settings.py` and change `DEBUG = True` to `DEBUG = False`.
