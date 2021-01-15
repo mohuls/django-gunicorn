@@ -95,6 +95,12 @@ Now develop the django application locally. Make sure the version of virtual env
 9. `$ python manage.py runserver 0.0.0.0:8000` to run the development server.
 10. Now Browse the server IP with port 8000 (http://server-ip:8000)to see if the app is running. (It should be running actually).
 
+# Select Web Server
+1. [Nginx]: 
+
+
+
+# Option-1 (Nginx web server)
 ## Run using gunicorn server (Remote)
 
 1. cd to project dir then make sure the virtual environment is active (`$ source env/bin/activate`)
@@ -180,3 +186,6 @@ server {
 
 1. When you are on production the disable the Debug mode in the settings.py.
 2. `$ nano stocks/settings.py` and change `DEBUG = True` to `DEBUG = False`.
+
+
+# Option-2 (Apache Web Server)
