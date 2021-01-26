@@ -1,19 +1,19 @@
 # Django Gunicorn
-This repository and README file describe basic python and django setup and deploy from local to cloud using Ubuntu 20.04 LTS, Nginx Web Server, Apache Web Server, Sqlite Database and Let's Encrypt SSL.
+This repository and README file describe basic python and django setup and deploy from local to cloud using Ubuntu 20.04 LTS, Nginx Web Server, Apache Web Server, Sqlite3 Database and Let's Encrypt SSL.
 
 **Usage Note:** This documentation is for both local and remote machine (Local & Cloud flagged). If the local machine is already configured then just setup the cloud according to the below guidelines.
 
-## Python and Virtual Environment Intro
-In this repo described the fully optimized way to install Python using **pyenv** so that we can install and manage different versions of Python in the both local and remote machine. Then described the optimized way to install python virtual environment for isolating individual python application.
+## Python, Pipenv and Virtual Environment Intro
+In this repo described the fully optimized way to install Python using **pyenv** so that we can install and manage different versions of Python in the both local and remote machine. Then described the optimized way to install python virtual environment for isolating individual python application and managing package dependencies using pipenv.
 
 **Important:** Using python virtual environment is very useful for developing any kind of python applications (ex: this django application). It is because we can use different version and dependencies for each appliccation running in the same machine. Moreover, as the virtual environment is installed right inside the project folder so that the envrionment for the application remains same for local and remote machine when it is subject to deploy from local to remote server. So that, the dependencies never conflict.
 
 ## Django, Gunicorn & Nginx Intro
-Django is a full stack web framework written in python for developing web applications and web API.
+**Django** is a full stack web framework written in python for developing web applications and web API.
 
-Gunicorn is a python application server that helps to run python application (in this case django application) also can be run flask application as well.
+**Gunicorn** is a python application server that helps to run python application (in this case django application) also can be run flask application as well.
 
-Nginx is a high end web application server for serving static and dynamic content. In this repo nginx is used with gunicorn for running our django aplication.
+**Nginx** is a high end web application server for serving static and dynamic content. In this repo nginx is used with gunicorn for running our django aplication.
 
 ## Ubuntu 20.04 Setup (Local & Cloud)
 We will not use root user alwyas. That's why we will create a new user with the sudo privilege.
@@ -36,46 +36,60 @@ Pyenv is a python package manager that can be used to manage multiple versions o
 
 1. `$ sudo apt update -y` to update the system.
 2. `$ sudo apt install -y build-essential` install the build dependencies.
-3. `$ sudo apt install zlib1g-dev libssl-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python-openssl`
+3. `$ sudo apt install zlib1g-dev libssl-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python-openssl python3-dev`
 3. `$ git clone https://github.com/pyenv/pyenv.git ~/.pyenv` to clone the latest version of git.
 4. `$ sudo echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc`
 5. `$ sudo echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc`
 6. `$ sudo echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n eval "$(pyenv init -)"\nfi' >> ~/.bashrc`
 7. `$ exec "$SHELL"`
 8. `$ pyenv --version`. Now pyenv is installed successfully.
+8. `$ pyenv update` to update the pyenv anytime.
 
 **Learn more about pyenv:** https://realpython.com/intro-to-pyenv/
 
 ##  Installing Python (Local & Remote)
-**Note:** The python version to be installed depend on the version that require the application. We can install multiple version of python and switch back to specific verion for our specific python version.
+**Note:** The python version to be installed depends on the version that require the application. We can install multiple version of python and switch back to specific verion for our specific python version.
 
 0. `$ pyenv install --list` to see all the available python version.
 1. `$ pyenv install x.x.x` to install the needed version. We can install multiple versions. We can activate specific version when we need to create a virtual environment for a specific application.
 2. `$ pyenv versions` to see installed/available version to activate.
-3. `$ pyenv global x.x.x` to activate a specific python version locally.
+3. `$ pyenv global x.x.x` to activate a specific python version globally.
 4. `$ pyenv global system` switch back to system version.
 
 **Note:** In this deployment we will use python 3.6.9
 
-## Creating Virtual Environments (Local & Remote)
+# Installing Pipenv (Python package manager):
+Pipenv is a python package manager intend to replace the pip tool. It is an integrated tool to work with virtual environment as well. Lets install Pipenv and then see its function:
+
+1. Before installing Pipenv make sure python and pip is already installed (`$ python -V, python3 -V` and `$ pip --version, pip3 --version`).
+2. If you are using multiple versions of python using pyenv then switch to the version of python that you want to work with Pipenv first (`$ pyenv global x.x.x`).
+3. `$ pip install --user pipenv` to install pipenv.
+4. `$ pipenv --version` to check the version.
+5. `$ pip install --user --upgrade pipenv` to upgrade Pipenv anytime.
+
+
+Learn more about Pipenv: https://github.com/mohuls/pipenv
+
+## Creating Virtual Environments using Pipenv (Local & Remote)
 
 **Important:** Before creating any virtual environment, switch to the desired python version using `$ pyenv global x.x.x`.
 
-1. `$ pip install --user virtualenv` to install virtual environment.
-2. `$ mkdir ~/django-gunicorn`  `$ cd ~/django-gunicorn` to project directory. Now to create a virtual env goto your project directory and type `$ python -m virtualenv env` it will create a virtual environment in the env folder.
-3. `$ source env/bin/activate` to active the virtual env. Now you are isolated in the project directory with your own python version and packages.
-4. To check the python and pip location type `$ which python` and `$ which pip`. Check if the installation location indicating the env folder or not. If indicates the env folder then the environment working fine (Environment activation is needed before checking).
+Now as the Pipenv package is installed, now go to the project directory where your Django project resides. And the follow the below commands:
+
+1. `$ pipenv install` to install virtual environment for the project directory under current user account and Generate Pipfile and Pipfile.lock that is actually the dependency file.
+2. `$ pipenv shell` to activate the virtual environment for the project dir. Now the project, python version and python packages are isolated. Now it is time to develop.
+3. `$ pipenv install <pkg-name==x.x.x>` to install a package specific version or `$ pipenv install <pkg-name>` to install latest version. It will install the specified packages and will add to Pipfile for keep tracking the dependencies for the project including Python version.
+
+**Developed locally:** https://github.com/mohuls/django-gunicorn
 
 **Note:** Make sure the app that was developed locally used python version is same as the virtual env.
 
 ## Develop Django Application (Locally)
 Now develop the django application locally. Make sure the version of virtual environment of development environment is same as the remote environment we just created.
 
-1. After development `$ pip freeze > requirements.txt` to store required packages.
-
 ## Pushing to GitHub (Local)
 
-1. Upload the source file to a GitHub repo. Keep env folder in the .gitignore file. So that env folder will not be uploaded. Because it is created in the remote server by following above instructions.
+1. Upload the source file to a GitHub repo.
 2. If the application uses databases rather than sqlite3. Then backup the database and put in source file (better keep that db file in db folder).
 3. `$ git init` then `$ git add .` the `$ git commit -m 'test deploy'`
 4. `$ git remote add origin git@github.com:mohuls/django-gunicorn.git` the GitHub repo we just created on GitHub.
@@ -86,8 +100,8 @@ Now develop the django application locally. Make sure the version of virtual env
 1. Clone the github repo `$ git clone https://github.com/mohuls/django-gunicorn` in a directory at server.
 2. Copy all the cloned files to project dir where you created the virtual environment `$ cp -a django-gunicorn/. ~/django-gunicorn`.
 2. cd to the project dir.
-3. `$ source env/bin/activate` to activate the virtual env (important).
-4. `$ pip install -r requirements.txt` to install all the required package.
+3. `$ pipenv install` to install all the dependencies from Pipfile and Pipfile.lock.
+4. `$ pipenv shell` to activate the virtual environment (.venv).
 5. `$ nano stocks/settings.py` and add the server IP or domain in the allowed hosts list. The line will looks like `ALLOWED_HOSTS = ['192.46.213.168', 'example.com']`. Now go to bottom of the file and add `STATIC_ROOT = os.path.join(BASE_DIR, 'static/')` for static file location. import the os modue at the top if it is not imported already.
 6. `$ python manage.py makemigrations` and `$ python manage.py migrate` to migrate the database.
 7. `$ python manage.py collectstatic` to compile static file in the static dir.
@@ -103,7 +117,7 @@ Now develop the django application locally. Make sure the version of virtual env
 # Option-1 (Nginx web server)
 ## Run using gunicorn server (Remote)
 
-1. cd to project dir then make sure the virtual environment is active (`$ source env/bin/activate`)
+1. cd to project dir then make sure the virtual environment is active (`$ pipenv shell`)
 2. `$ pip install gunicorn` to install gunicorn application server.
 3. `$ gunicorn --bind 0.0.0.0:8000 stocks.wsgi` to start the application using gunicorn server.
 
@@ -111,7 +125,7 @@ Now develop the django application locally. Make sure the version of virtual env
 ## Configuring Gunicorn Startup service
 
 1. Cd to project dir.
-2. `$ deactivate` to deactivate the virtual environment.
+2. `$ exit` to deactivate the virtual environment.
 3. `$ sudo nano /etc/systemd/system/django-gunicorn.service` here **django-gunicorn** is the gunicorn service name. Change according to your choice. Conventionally use the name of the app. Paste the following:
 
 ```conf
@@ -120,10 +134,10 @@ Description=gunicorn service for serving a django app
 After=network.target
 
 [Service]
-User=mohul
+User=lina
 Group=www-data
-WorkingDirectory=/home/mohul/django-gunicorn
-ExecStart=/home/mohul/django-gunicorn/env/bin/gunicorn --access-logfile - --workers 3 --bind unix:/home/mohul/django-gunicorn/django-gunicorn.sock stocks.wsgi:application
+WorkingDirectory=/home/lina/django-gunicorn
+ExecStart=/home/lina/django-gunicorn/env/bin/gunicorn --access-logfile - --workers 3 --bind unix:/home/lina/django-gunicorn/django-gunicorn.sock stocks.wsgi:application
 
 [Install]
 WantedBy=multi-user.target
