@@ -51,26 +51,27 @@ Pyenv is a python package manager that can be used to manage multiple versions o
 **Note:** The python version to be installed depends on the version that require the application. We can install multiple version of python and switch back to specific verion for our specific python version.
 
 0. `$ pyenv install --list` to see all the available python version.
-1. `$ pyenv install x.x.x` to install the needed version. We can install multiple versions. We can activate specific version when we need to create a virtual environment for a specific application.
+1. `$ pyenv install x.x.x` (3.6.9 in this project) to install the needed version. We can install multiple versions. We can activate specific version when we need to create a virtual environment for a specific application.
 2. `$ pyenv versions` to see installed/available version to activate.
 3. `$ pyenv global x.x.x` to activate a specific python version globally.
 4. `$ pyenv global system` switch back to system version.
 
 **Note:** In this deployment we will use python 3.6.9
 
-# Installing Pipenv (Python package manager):
-Pipenv is a python package manager intend to replace the pip tool. It is an integrated tool to work with virtual environment as well. Lets install Pipenv and then see its function:
+## Installing Pipenv (Python package manager):
+Pipenv is a python package manager intend to replace the pip tool. It is an integrated tool to work with virtual environment as well. Let's install Pipenv and then see its function:
 
 1. Before installing Pipenv make sure python and pip is already installed (`$ python -V, python3 -V` and `$ pip --version, pip3 --version`).
 2. If you are using multiple versions of python using pyenv then switch to the version of python that you want to work with Pipenv first (`$ pyenv global x.x.x`).
 3. `$ pip install --user pipenv` to install pipenv.
 4. `$ pipenv --version` to check the version.
-5. `$ pip install --user --upgrade pipenv` to upgrade Pipenv anytime.
+5. If pipenv command does not work then, `$ pip uninstall pipenv` and then run `$ pip install pipenv` now it should work.
+6. `$ pip install --user --upgrade pipenv` to upgrade Pipenv anytime.
 
 
 Learn more about Pipenv: https://github.com/mohuls/pipenv
 
-## Creating Virtual Environments using Pipenv (Local & Remote)
+## Creating Virtual Environments using Pipenv (Local)
 
 **Important:** Before creating any virtual environment, switch to the desired python version using `$ pyenv global x.x.x`.
 
@@ -97,10 +98,8 @@ Now develop the django application locally. Make sure the version of virtual env
 
 ## Deploying to Live Server (Remote)
 
-1. Clone the github repo `$ git clone https://github.com/mohuls/django-gunicorn` in a directory at server.
-2. Copy all the cloned files to project dir where you created the virtual environment `$ cp -a django-gunicorn/. ~/django-gunicorn`.
-2. cd to the project dir.
-3. `$ pipenv install` to install all the dependencies from Pipfile and Pipfile.lock.
+1. Clone the github repo `$ git clone https://github.com/mohuls/django-gunicorn` in user home directory.
+2. `$ cd django-gunicorn` and then `$ pipenv install` to install all the dependencies from Pipfile and Pipfile.lock.
 4. `$ pipenv shell` to activate the virtual environment (.venv).
 5. `$ nano stocks/settings.py` and add the server IP or domain in the allowed hosts list. The line will looks like `ALLOWED_HOSTS = ['192.46.213.168', 'example.com']`. Now go to bottom of the file and add `STATIC_ROOT = os.path.join(BASE_DIR, 'static/')` for static file location. import the os modue at the top if it is not imported already.
 6. `$ python manage.py makemigrations` and `$ python manage.py migrate` to migrate the database.
@@ -109,7 +108,7 @@ Now develop the django application locally. Make sure the version of virtual env
 9. `$ python manage.py runserver 0.0.0.0:8000` to run the development server.
 10. Now Browse the server IP with port 8000 (http://server-ip:8000)to see if the app is running. (It should be running actually).
 
-# Select Web Server
+# Select Web Server (Remote)
 1. [Nginx](https://github.com/mohuls/django-gunicorn#option-1-nginx-web-server)
 2. [Apache](https://github.com/mohuls/django-gunicorn#option-2-apache-web-server)
 
@@ -118,7 +117,7 @@ Now develop the django application locally. Make sure the version of virtual env
 ## Run using gunicorn server (Remote)
 
 1. cd to project dir then make sure the virtual environment is active (`$ pipenv shell`)
-2. `$ pip install gunicorn` to install gunicorn application server.
+2. `$ pipenv install gunicorn` to install gunicorn application server.
 3. `$ gunicorn --bind 0.0.0.0:8000 stocks.wsgi` to start the application using gunicorn server.
 
 
@@ -137,7 +136,7 @@ After=network.target
 User=lina
 Group=www-data
 WorkingDirectory=/home/lina/django-gunicorn
-ExecStart=/home/lina/django-gunicorn/env/bin/gunicorn --access-logfile - --workers 3 --bind unix:/home/lina/django-gunicorn/django-gunicorn.sock stocks.wsgi:application
+ExecStart=/home/lina/.local/share/virtualenvs/django-gunicorn-3Op5-KvH/bin/gunicorn --access-logfile - --workers 3 --bind unix:/home/lina/django-gunicorn/django-gunicorn.sock stocks.wsgi:application
 
 [Install]
 WantedBy=multi-user.target
@@ -160,12 +159,12 @@ server {
 
     location = /favicon.ico { access_log off; log_not_found off; }
     location /static/ {
-        root /home/mohul/django-gunicorn;
+        root /home/lina/django-gunicorn;
     }
 
     location / {
         include proxy_params;
-        proxy_pass http://unix:/home/mohul/django-gunicorn/django-gunicorn.sock;
+        proxy_pass http://unix:/home/lina/django-gunicorn/django-gunicorn.sock;
     }
 }
 ``` 
