@@ -37,11 +37,15 @@ Pyenv is a python package manager that can be used to manage multiple versions o
 1. `$ sudo apt update -y` to update the system.
 2. `$ sudo apt install -y build-essential` install the build dependencies.
 3. `$ sudo apt install zlib1g-dev libssl-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python-openssl python3-dev`
-3. `$ git clone https://github.com/pyenv/pyenv.git ~/.pyenv` to clone the latest version of git.
-4. `$ sudo echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc`
-5. `$ sudo echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc`
-6. `$ sudo echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n eval "$(pyenv init -)"\nfi' >> ~/.bashrc`
-7. `$ exec "$SHELL"`
+3. `$ curl https://pyenv.run | bash` to clone the latest version of pyenv for managigng pyenv (Python Virsion control package)
+4. Now need to open the `.bashrc` file by typeing `$ nano ~/.bashrc`. In this file go to the bottom of this file and add the following three lines.
+    ```
+    export PATH="$HOME/.pyenv/bin:$PATH"
+    eval "$(pyenv init --path)"
+    eval "$(pyenv virtualenv-init -)"
+    ```
+    Then the file by `Ctrl+X the Y then Enter`
+7. `$ exec "$SHELL"` Then run this command to take effect in CMD.
 8. `$ pyenv --version`. Now pyenv is installed successfully.
 8. `$ pyenv update` to update the pyenv anytime.
 
@@ -67,7 +71,6 @@ Pipenv is a python package manager intend to replace the pip tool. It is an inte
 4. `$ pipenv --version` to check the version.
 5. If pipenv command does not work then, `$ pip uninstall pipenv` and then run `$ pip install pipenv` now it should work.
 6. `$ pip install --user --upgrade pipenv` to upgrade Pipenv anytime.
-
 
 Learn more about Pipenv: https://github.com/mohuls/pipenv
 
@@ -199,7 +202,3 @@ server {
 
 1. When you are on production the disable the Debug mode in the settings.py.
 2. `$ nano stocks/settings.py` and change `DEBUG = True` to `DEBUG = False`.
-
-
-# Option-2 (Apache Web Server)
-See you later...
