@@ -23,7 +23,7 @@ We will not use root user alwyas. That's why we will create a new user with the 
 3. Use a non-root sudo user for all the below operations.
 **Hints:** To connect via SSH, add your local machine's public key (~/.ssh/id_rsa.pub) to the cloud SSH portion and then access the remote via $ ssh root@your_server_ip or use a .pem private key file for corresponding added public key on the machine (ex: EC2) by $ ssh -i 'key.pem' user@server-ip.
 
-## Creating user account
+## Creating user account (Remote)
 1. `$ sudo adduser lina` Then enter password and info to create user.
 2. `$ usermod -aG sudo lina` to add lina to sudo
 3. `$ sudo ufw app list` to see all the firewall list
@@ -62,7 +62,7 @@ Pyenv is a python package manager that can be used to manage multiple versions o
 
 **Note:** In this deployment we will use python 3.6.9
 
-## Installing Pipenv (Python package manager):
+## Installing Pipenv (Python package manager) - (Local & Remote):
 Pipenv is a python package manager intend to replace the pip tool. It is an integrated tool to work with virtual environment as well. Let's install Pipenv and then see its function:
 
 1. Before installing Pipenv make sure python and pip is already installed (`$ python -V, python3 -V` and `$ pip --version, pip3 --version`).
@@ -74,7 +74,7 @@ Pipenv is a python package manager intend to replace the pip tool. It is an inte
 
 Learn more about Pipenv: https://github.com/mohuls/pipenv
 
-## Creating Virtual Environments using Pipenv (Local)
+## Creating Virtual Environments using Pipenv (Local/Global)
 
 **Important:** Before creating any virtual environment, switch to the desired python version using `$ pyenv global x.x.x`.
 
@@ -84,14 +84,15 @@ Now as the Pipenv package is installed, now go to the project directory where yo
 2. `$ pipenv shell` to activate the virtual environment for the project dir. Now the project, python version and python packages are isolated. Now it is time to develop.
 3. `$ pipenv install <pkg-name==x.x.x>` to install a package specific version or `$ pipenv install <pkg-name>` to install latest version. It will install the specified packages and will add to Pipfile for keep tracking the dependencies for the project including Python version.
 
+# Deplyment Local to Remote
 **Developed locally:** https://github.com/mohuls/django-gunicorn
 
 **Note:** Make sure the app that was developed locally used python version is same as the virtual env.
 
-## Develop Django Application (Locally)
+### Develop Django Application (Local)
 Now develop the django application locally. Make sure the version of virtual environment of development environment is same as the remote environment we just created.
 
-## Pushing to GitHub (Local)
+### Pushing to GitHub (Local)
 
 1. Upload the source file to a GitHub repo.
 2. If the application uses databases rather than sqlite3. Then backup the database and put in source file (better keep that db file in db folder).
@@ -99,8 +100,7 @@ Now develop the django application locally. Make sure the version of virtual env
 4. `$ git remote add origin git@github.com:mohuls/django-gunicorn.git` the GitHub repo we just created on GitHub.
 5. `$ git push -u origin master` to push the full project to GitHub repo.
 
-## Deploying to Live Server (Remote)
-
+### Deploying to Live Server (Remote)
 1. Clone the github repo `$ git clone https://github.com/mohuls/django-gunicorn` in user home directory.
 2. `$ cd django-gunicorn` and then `$ pipenv install` to install all the dependencies from Pipfile and Pipfile.lock.
 4. `$ pipenv shell` to activate the virtual environment (.venv).
@@ -111,20 +111,24 @@ Now develop the django application locally. Make sure the version of virtual env
 9. `$ python manage.py runserver 0.0.0.0:8000` to run the development server.
 10. Now Browse the server IP with port 8000 (http://server-ip:8000)to see if the app is running. (It should be running actually).
 
-# Select Web Server (Remote)
-1. [Nginx](https://github.com/mohuls/django-gunicorn#option-1-nginx-web-server)
-2. [Apache](https://github.com/mohuls/django-gunicorn#option-2-apache-web-server)
+
+# Starting project on Remote Server (Remote)
+1. In VS Code, Install the SSH Remote Explorer Package
+2. Then access the VPS using IP, username and password: (example: ssh username@id-address)
+3. Giving above command will ask for password, Enter the server password it will open the folder now create a folder in the server from terminal using `mkdir` command
+4. Then open the folder by clicking the open folder from file menu.
+5. Once the folder is opened then start creating project from the terminal or manage files form file explorer.
 
 
-# Option-1 (Nginx web server)
-## Run using gunicorn server (Remote)
+# Nginx Web Server (Remote)
+### Run using gunicorn server (Remote)
 
 1. cd to project dir then make sure the virtual environment is active (`$ pipenv shell`)
 2. `$ pipenv install gunicorn` to install gunicorn application server.
 3. `$ gunicorn --bind 0.0.0.0:8000 stocks.wsgi` to start the application using gunicorn server.
 
 
-## Configuring Gunicorn Startup service
+### Configuring Gunicorn Startup service (Remote)
 
 1. Cd to project dir.
 2. `$ exit` to deactivate the virtual environment.
@@ -152,7 +156,7 @@ WantedBy=multi-user.target
 7. `$ sudo systemctl status django-gunicorn` to check the status.
 8. `$ sudo systemctl stop django-gunicorn` to stop the service.
 
-## Configuring Nginx
+### Configuring Nginx (Remote)
 1. `$ sudo apt install nginx` to install nginx server.
 2. `$ sudo nano /etc/nginx/sites-available/django-gunicorn` create a nginx server configaration.
 ```conf
@@ -180,7 +184,7 @@ server {
 8. `$ sudo ufw allow 'Nginx Full'` to allow nginx traffic.
 9. Now browse the server IP again. Now it should serve the application using Nginx web server by piping to gunicorn server.
 
-## Configuring Domain
+### Configuring Domain (Remote)
 
 0. Edit the `$ nano stocks/settings.py` file and add the domain name in the `ALLOWED_HOSTS` list.
 1. `$ sudo nano /etc/nginx/sites-available/django-gunicorn` edit the server block file. Replace the domain name you want to configure with the server IP.
@@ -189,7 +193,7 @@ server {
 4. Wait for propagrating the domain wordwide (can take upto 48 hours)
 5. Now the app sould be accessed by the domain name.
 
-## Configuring Let's Encrypt SSL
+### Configuring Let's Encrypt SSL (Remote)
 1. `$ sudo apt install python3-certbot-nginx` to install certbot.
 2. `$ sudo ufw allow 'Nginx Full'` allow Nginx in http and htpps.
 3. `$ sudo nano /etc/nginx/sites-available/django-gunicorn` and add the host name as the domain name that is configured with the server ip: server_name mohuls.com www.mohuls.com;
@@ -198,7 +202,7 @@ server {
 6. `$ sudo systemctl status certbot.timer` to check status.
 7. `$ sudo certbot renew --dry-run` tests renewal process. Now the site should serve in https.
 
-## Disable Debug Mode
+### Disable Debug Mode
 
 1. When you are on production the disable the Debug mode in the settings.py.
 2. `$ nano stocks/settings.py` and change `DEBUG = True` to `DEBUG = False`.
