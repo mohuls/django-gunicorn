@@ -23,7 +23,7 @@ We will not use root user alwyas. That's why we will create a new user with the 
 3. Use a non-root sudo user for all the below operations.
 **Hints:** To connect via SSH, add your local machine's public key (~/.ssh/id_rsa.pub) to the cloud SSH portion and then access the remote via $ ssh root@your_server_ip or use a .pem private key file for corresponding added public key on the machine (ex: EC2) by $ ssh -i 'key.pem' user@server-ip.
 
-## Creating user account (Remote)
+## Creating user account (Local & Remote)
 1. `$ sudo adduser lina` Then enter password and info to create user.
 2. `$ usermod -aG sudo lina` to add lina to sudo
 3. `$ sudo ufw app list` to see all the firewall list
@@ -74,7 +74,7 @@ Pipenv is a python package manager intend to replace the pip tool. It is an inte
 
 Learn more about Pipenv: https://github.com/mohuls/pipenv
 
-## Creating Virtual Environments using Pipenv (Local/Global)
+## Creating Virtual Environments using Pipenv (Local & Remote)
 
 **Important:** Before creating any virtual environment, switch to the desired python version using `$ pyenv global x.x.x`.
 
